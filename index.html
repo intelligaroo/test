@@ -3,110 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenAI API Example</title>
+  <title>Chatbot</title>
   <style>
-    /* General Body Styling */
     body {
-      background-color: #ffeaa7; /* Light yellow for a cheerful vibe */
-      color: #2d3436; /* Dark gray for text */
-      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Playful cartoon-like font */
-      text-align: center;
-      padding: 20px;
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    /* Heading Style */
     h1 {
-      font-size: 3rem;
-      color: #0984e3; /* Bright blue */
-      text-shadow: 2px 2px #74b9ff; /* Shadow for depth */
-      margin-bottom: 20px;
+      background-color: #0984e3;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      margin: 0;
     }
 
-    /* Input Field */
-    #user-input {
-      width: 60%;
-      padding: 10px;
-      font-size: 1.2rem;
-      border: 3px solid #00cec9; /* Bright teal */
+    /* Chat container */
+    #chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Chat bubbles */
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
       border-radius: 15px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background-color: #0984e3;
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background-color: #dfe6e9;
+      color: #2d3436;
+      border-bottom-left-radius: 5px;
+    }
+
+    /* Input area */
+    #input-area {
+      display: flex;
+      padding: 15px;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid #ccc;
+      border-radius: 8px;
       outline: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     #user-input:focus {
-      border-color: #00b894; /* Highlight on focus */
-      background-color: #dfe6e9; /* Light gray for contrast */
+      border-color: #0984e3;
     }
 
-    /* Button Style */
     #fetch-data {
-      background-color: #fab1a0; /* Soft pink */
-      color: #2d3436;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border: 3px solid #fd79a8; /* Bright pink */
-      border-radius: 20px;
-      padding: 10px 20px;
-      margin-top: 15px;
+      margin-left: 10px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      background-color: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s, background-color 0.3s;
+      transition: background-color 0.3s;
     }
 
     #fetch-data:hover {
-      background-color: #ff7675; /* Bright red */
-      transform: scale(1.1); /* Slight enlargement on hover */
-    }
-
-    /* Result Display */
-    #result {
-      margin-top: 30px;
-      padding: 20px;
-      background-color: #ffeaa7; /* Same background color as the body */
-      border: 3px solid #fab1a0; /* Matching button color */
-      border-radius: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      font-size: 1.2rem;
-      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-      white-space: pre-wrap; /* Preserve whitespace */
+      background-color: #0863b8;
     }
   </style>
 </head>
 <body>
-  <h1>Ask me a question</h1>
-  <input type="text" id="user-input" placeholder="Type your question here">
-  <button id="fetch-data">Submit</button>
-  <pre id="result"></pre>
+  <h1>Chat with AI</h1>
 
-  <!-- Include Axios via CDN -->
+  <!-- Chat messages will appear here -->
+  <div id="chat-container"></div>
+
+  <!-- Input area -->
+  <div id="input-area">
+    <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
+    <button id="fetch-data">Send</button>
+  </div>
+
+  <!-- Axios CDN -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script type="module">
-    // Function to fetch data from the backend API
+    const chatContainer = document.getElementById('chat-container');
+    const userInputElement = document.getElementById('user-input');
+    const fetchDataButton = document.getElementById('fetch-data');
+
+    // Append message to chat
+    function appendMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+      messageDiv.textContent = text;
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
+    }
+
+    // Fetch API completion
     async function fetchCompletion(userMessage) {
+      appendMessage(userMessage, 'user'); // show user msg
+      userInputElement.value = '';
+
       try {
-        // Make a POST request to the backend API
         const response = await axios.post('/api/openai', { userMessage });
-        // Display the result from the API
         const result = response.data.result;
-        resultElement.textContent = result;
+        appendMessage(result, 'bot');
       } catch (error) {
         console.error("Error fetching data:", error);
-        resultElement.textContent = "Error fetching data. Check console for details.";
+        appendMessage("⚠️ Error fetching response. Check console.", 'bot');
       }
     }
 
-    // DOM elements
-    const userInputElement = document.getElementById('user-input');
-    const fetchDataButton = document.getElementById('fetch-data');
-    const resultElement = document.getElementById('result');
-
-    // Event listener for the button
+    // Send message on button click
     fetchDataButton.addEventListener('click', () => {
       const userInput = userInputElement.value.trim();
       if (userInput) {
-        fetchCompletion(userInput); // Call the fetch function with user input
-      } else {
-        resultElement.textContent = "Please enter a question!";
+        fetchCompletion(userInput);
+      }
+    });
+
+    // Send message with Enter (Shift+Enter for new line)
+    userInputElement.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        fetchDataButton.click();
       }
     });
   </script>
