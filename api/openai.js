@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const data = {
       model: 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a personal Python programming tutor.'  },
+        { role: 'system', content: 'You are a personal Python programming tutor. Provide hints in a step-by-step style, preserving line breaks. Use emojis and arrows where appropriate. Use bold for headers like "Hints for you:". Indent examples and tips. If needed provide small code snippets but do not provide a full solution.'  },
         { role: 'user', content: userMessage },
       ],
     };
