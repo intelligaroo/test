@@ -40,7 +40,7 @@
       margin-bottom: 12px;
       line-height: 1.4;
       word-wrap: break-word;
-      white-space: pre-wrap; /* preserves line breaks */
+      white-space: pre-wrap;
     }
 
     .user-message {
@@ -72,7 +72,7 @@
       border: 2px solid #ccc;
       border-radius: 8px;
       outline: none;
-      resize: vertical; /* allow resizing for multi-line */
+      resize: vertical;
       min-height: 50px;
       max-height: 150px;
     }
@@ -108,7 +108,7 @@
 
   <!-- Input area -->
   <div id="input-area">
-    <textarea id="user-input" placeholder="Type your message... (use multiple lines if needed)"></textarea>
+    <textarea id="user-input" placeholder="Type your message... (multi-line supported)"></textarea>
     <button id="fetch-data">Send</button>
   </div>
 
@@ -125,21 +125,25 @@
       messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
       messageDiv.textContent = text;
       chatContainer.appendChild(messageDiv);
-      chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      return messageDiv; // return element (so we can update it later)
     }
 
     // Fetch API completion
     async function fetchCompletion(userMessage) {
-      appendMessage(userMessage, 'user'); // show user msg
+      appendMessage(userMessage, 'user'); // user msg
       userInputElement.value = '';
+
+      // temporary "thinking" message
+      const thinkingDiv = appendMessage("Thinking and Analysing…", 'bot');
 
       try {
         const response = await axios.post('/api/openai', { userMessage });
         const result = response.data.result;
-        appendMessage(result, 'bot');
+        thinkingDiv.textContent = result; // replace text
       } catch (error) {
         console.error("Error fetching data:", error);
-        appendMessage("⚠️ Error fetching response. Check console.", 'bot');
+        thinkingDiv.textContent = "⚠️ Error fetching response. Check console.";
       }
     }
 
