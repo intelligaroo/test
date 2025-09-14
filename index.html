@@ -40,6 +40,7 @@
       margin-bottom: 12px;
       line-height: 1.4;
       word-wrap: break-word;
+      white-space: pre-wrap; /* preserves line breaks */
     }
 
     .user-message {
@@ -71,6 +72,9 @@
       border: 2px solid #ccc;
       border-radius: 8px;
       outline: none;
+      resize: vertical; /* allow resizing for multi-line */
+      min-height: 50px;
+      max-height: 150px;
     }
 
     #user-input:focus {
@@ -87,6 +91,8 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s;
+      height: fit-content;
+      align-self: flex-end;
     }
 
     #fetch-data:hover {
@@ -102,7 +108,7 @@
 
   <!-- Input area -->
   <div id="input-area">
-    <textarea id="user-input" rows="1" placeholder="Type your message..."></textarea>
+    <textarea id="user-input" placeholder="Type your message... (use multiple lines if needed)"></textarea>
     <button id="fetch-data">Send</button>
   </div>
 
@@ -137,19 +143,11 @@
       }
     }
 
-    // Send message on button click
+    // Send message only on "Send" button click
     fetchDataButton.addEventListener('click', () => {
       const userInput = userInputElement.value.trim();
       if (userInput) {
         fetchCompletion(userInput);
-      }
-    });
-
-    // Send message with Enter (Shift+Enter for new line)
-    userInputElement.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        fetchDataButton.click();
       }
     });
   </script>
