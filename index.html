@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI API Example</title>
+  <style>
+    /* General Body Styling */
+    body {
+      background-color: #ffeaa7; /* Light yellow for a cheerful vibe */
+      color: #2d3436; /* Dark gray for text */
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Playful cartoon-like font */
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Heading Style */
+    h1 {
+      font-size: 3rem;
+      color: #0984e3; /* Bright blue */
+      text-shadow: 2px 2px #74b9ff; /* Shadow for depth */
+      margin-bottom: 20px;
+    }
+
+    /* Input Field */
+    #user-input {
+      width: 60%;
+      padding: 10px;
+      font-size: 1.2rem;
+      border: 3px solid #00cec9; /* Bright teal */
+      border-radius: 15px;
+      outline: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #user-input:focus {
+      border-color: #00b894; /* Highlight on focus */
+      background-color: #dfe6e9; /* Light gray for contrast */
+    }
+
+    /* Button Style */
+    #fetch-data {
+      background-color: #fab1a0; /* Soft pink */
+      color: #2d3436;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: 3px solid #fd79a8; /* Bright pink */
+      border-radius: 20px;
+      padding: 10px 20px;
+      margin-top: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, background-color 0.3s;
+    }
+
+    #fetch-data:hover {
+      background-color: #ff7675; /* Bright red */
+      transform: scale(1.1); /* Slight enlargement on hover */
+    }
+
+    /* Result Display */
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #ffeaa7; /* Same background color as the body */
+      border: 3px solid #fab1a0; /* Matching button color */
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 1.2rem;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+      white-space: pre-wrap; /* Preserve whitespace */
+    }
+  </style>
+</head>
+<body>
+  <h1>Ask me a question</h1>
+  <input type="text" id="user-input" placeholder="Type your question here">
+  <button id="fetch-data">Submit</button>
+  <pre id="result"></pre>
+
+  <!-- Include Axios via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script type="module">
+    // Function to fetch data from the backend API
+    async function fetchCompletion(userMessage) {
+      try {
+        // Make a POST request to the backend API
+        const response = await axios.post('/api/openai', { userMessage });
+        // Display the result from the API
+        const result = response.data.result;
+        resultElement.textContent = result;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        resultElement.textContent = "Error fetching data. Check console for details.";
+      }
+    }
+
+    // DOM elements
+    const userInputElement = document.getElementById('user-input');
+    const fetchDataButton = document.getElementById('fetch-data');
+    const resultElement = document.getElementById('result');
+
+    // Event listener for the button
+    fetchDataButton.addEventListener('click', () => {
+      const userInput = userInputElement.value.trim();
+      if (userInput) {
+        fetchCompletion(userInput); // Call the fetch function with user input
+      } else {
+        resultElement.textContent = "Please enter a question!";
+      }
+    });
+  </script>
+</body>
+</html>
